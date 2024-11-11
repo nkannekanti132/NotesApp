@@ -1,5 +1,9 @@
 package com.example.notesapp.fragments
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import android.icu.text.SimpleDateFormat
+import android.icu.util.Calendar
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -15,10 +19,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.findNavController
 import com.example.notesapp.MainActivity
 import com.example.notesapp.R
-import com.example.notesapp.adapter.NoteAdapter
 import com.example.notesapp.databinding.FragmentAddNoteBinding
 import com.example.notesapp.model.Note
+import com.example.notesapp.notifications.NotificationHelper
+import com.example.notesapp.utils.requestExactAlarmPermission
 import com.example.notesapp.viewmodel.NoteViewModel
+import java.util.Locale
 
 
 class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
@@ -28,6 +34,7 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
 
     private lateinit var noteViewModel: NoteViewModel
     private lateinit var addNoteView: View
+    private var selectedReminderDateTime: Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,28 +58,14 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
 
         noteViewModel = (activity as MainActivity).noteViewModel
 
+
+
         addNoteView = view
-    }
-
-    private fun saveNote(view: View)
-    {
-        val noteTitle = binding.addNoteTitle.text.trim().toString()
-        val noteDesc = binding.addNoteDesc.text.trim().toString()
-
-        if(noteTitle.isNotEmpty())
-        {
-            val note = Note(0,noteTitle,noteDesc)
-            noteViewModel.addNote(note)
-
-            Toast.makeText(addNoteView.context,"Note Saved",Toast.LENGTH_SHORT).show()
-
-            view.findNavController().popBackStack(R.id.homeFragment,false)
-
-        }else{
-            Toast.makeText(addNoteView.context,"Please Enter Note Title",Toast.LENGTH_SHORT).show()
+        binding.addReminderButton.setOnClickListener {
+            showDateTimePicker()
         }
-
     }
+
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         menu.clear()
@@ -91,10 +84,71 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
         }
     }
 
+    private fun showDateTimePicker() {
+        val calendar = Calendar.getInstance()
+        val datePicker = DatePickerDialog(
+            requireContext(),
+            { _, year, month, dayOfMonth ->
+                calendar.set(year, month, dayOfMonth)
+                val timePicker = TimePickerDialog(
+                    requireContext(),
+                    { _, hourOfDay, minute ->
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                        calendar.set(Calendar.MINUTE, minute)
+                        calendar.set(Calendar.SECOND, 0)
+                        selectedReminderDateTime = calendar.timeInMillis
+
+                        val formattedDateTime = SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault()).format(calendar.time)
+                        binding.selectedReminderDate.text = "Reminder set for: $formattedDateTime"
+                    },
+                    calendar.get(Calendar.HOUR_OF_DAY),
+                    calendar.get(Calendar.MINUTE),
+                    true
+                )
+                timePicker.show()
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+        datePicker.show()
+    }
+
+    private fun saveNote(view: View) {
+        val noteTitle = binding.addNoteTitle.text.trim().toString()
+        val noteDesc = binding.addNoteDesc.text.trim().toString()
+
+        if (noteTitle.isNotEmpty()) {
+            val note = Note(
+                id = 0,
+                noteTitle = noteTitle,
+                noteDesc = noteDesc,
+                reminderDate = selectedReminderDateTime
+            )
+            noteViewModel.addNote(note)
+
+
+            requestExactAlarmPermission(requireContext())
+
+            selectedReminderDateTime?.let {
+                val notificationHelper = NotificationHelper(requireContext())
+                notificationHelper.scheduleNotification(noteTitle, it)
+            }
+
+            Toast.makeText(requireContext(), "Note Saved", Toast.LENGTH_SHORT).show()
+            view.findNavController().popBackStack(R.id.homeFragment, false)
+        } else {
+            Toast.makeText(requireContext(), "Please Enter Note Title", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
     override fun onDestroy() {
         super.onDestroy()
         addNoteBinding = null
     }
+
+
 
 
 }
