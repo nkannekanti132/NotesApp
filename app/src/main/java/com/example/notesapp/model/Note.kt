@@ -13,5 +13,6 @@ data class Note(
     val id:Int,
     val noteTitle: String,
     val noteDesc: String,
-    val reminderDate: Long? = null
+    val reminderDate: Long? = null,
+    var isPinned: Boolean = false
 ): Parcelable

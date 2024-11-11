@@ -13,6 +13,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.notesapp.MainActivity
@@ -48,6 +49,15 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
 
         noteViewModel = (activity as MainActivity).noteViewModel
         setupRecyclerView()
+        noteViewModel.getAllNotes().observe(viewLifecycleOwner) { notes ->
+            val sortedNotes = notes.sortedByDescending { it.isPinned }
+            noteAdapter.differ.submitList(sortedNotes)
+            updateUI(sortedNotes)
+        }
+
+
+
+
 
         binding.addNoteFab.setOnClickListener {
             it.findNavController().navigate(R.id.action_homeFragment_to_addNoteFragment)
@@ -73,7 +83,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
 
     private fun setupRecyclerView()
     {
-        noteAdapter = NoteAdapter()
+        noteAdapter = activity?.let { NoteAdapter(noteViewModel, it) }!!
 
         binding.homeRecyclerView.apply {
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
@@ -81,13 +91,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
             adapter = noteAdapter
 
         }
-        activity?.let {
-            noteViewModel.getAllNotes().observe(viewLifecycleOwner){
-                notes->
-                noteAdapter.differ.submitList(notes)
-                updateUI(notes)
-            }
-        }
+
     }
 
     private fun searchNote(query: String)

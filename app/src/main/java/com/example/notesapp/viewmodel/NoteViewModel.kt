@@ -25,4 +25,6 @@ class NoteViewModel(app:Application, private val noteRepository: NoteRepository)
 
     fun searchNotes(query: String?) = noteRepository.searchNotes(query)
 
+    fun getPinnedNotes() = noteRepository.getPinnedNotes()
+
 }
