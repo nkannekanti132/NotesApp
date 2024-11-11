@@ -3,6 +3,7 @@ package com.example.notesapp.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -11,6 +12,8 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.notesapp.R
 import com.example.notesapp.databinding.NoteLayoutBinding
 import com.example.notesapp.fragments.HomeFragmentDirections
 import com.example.notesapp.model.Note
@@ -53,8 +56,12 @@ class NoteAdapter(val noteViewModel: NoteViewModel, val context: Context): Recyc
         holder.itemBinding.pinnedIcon.isVisible = currentNote.isPinned  // Show pinned symbol if note is pinned
 
         // Check if an image is associated with the note
+        Log.d("tttddd",currentNote.toString())
         if (currentNote.imageUri != null) {
-            holder.itemBinding.noteImage.setImageURI(Uri.parse(currentNote.imageUri))
+            // Use Glide to load the image URI
+            Glide.with(holder.itemView.context)
+                .load(Uri.parse(currentNote.imageUri))
+                .into(holder.itemBinding.noteImage)
         }
         holder.itemView.setOnLongClickListener {
             currentNote.isPinned = !holder.itemBinding.pinnedIcon.isVisible

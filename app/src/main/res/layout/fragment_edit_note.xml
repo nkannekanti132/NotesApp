@@ -60,21 +60,42 @@
             android:layout_height="wrap_content"
             android:text="No reminder set"
             android:textAppearance="?android:attr/textAppearanceSmall" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/addImageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:text="Add Image" />
+            <Button
+                android:id="@+id/removeImageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="36dp"
+                android:text="Remove Image" />
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/editNoteFab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:backgroundTint="@color/pink"
+                android:tintMode="@color/white"
+                android:src="@drawable/baseline_done_24"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:contentDescription="editFab" />
+        </LinearLayout>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/editNoteFab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
-            android:clickable="true"
-            android:backgroundTint="@color/pink"
-            android:tintMode="@color/white"
-            android:src="@drawable/baseline_done_24"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:contentDescription="editFab" />
+        <ImageView
+            android:id="@+id/addNoteImage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="Selected Image" />
+
 
     </LinearLayout>
 </layout>

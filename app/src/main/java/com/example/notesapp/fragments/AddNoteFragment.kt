@@ -37,11 +37,13 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
     private lateinit var noteViewModel: NoteViewModel
     private lateinit var addNoteView: View
     private var selectedReminderDateTime: Long? = null
+    private var selectedImageUri: Uri? = null  // Store the selected image URI here
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
-            // Set the image URI to the binding
+            selectedImageUri = uri
             binding.addNoteImage.setImageURI(uri)
+            binding.addNoteImage.visibility = View.VISIBLE
         }
     }
 
@@ -72,6 +74,11 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
         addNoteView = view
         binding.addImageButton.setOnClickListener {
             pickImageLauncher.launch("image/*") // Allow user to select an image
+        }
+        binding.removeImageButton.setOnClickListener {
+            selectedImageUri = null
+            binding.addNoteImage.visibility = View.GONE
+
         }
         binding.addReminderButton.setOnClickListener {
             showDateTimePicker()
@@ -137,7 +144,8 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
                 id = 0,
                 noteTitle = noteTitle,
                 noteDesc = noteDesc,
-                reminderDate = selectedReminderDateTime
+                reminderDate = selectedReminderDateTime,
+                imageUri =  selectedImageUri?.toString()
             )
             noteViewModel.addNote(note)
 

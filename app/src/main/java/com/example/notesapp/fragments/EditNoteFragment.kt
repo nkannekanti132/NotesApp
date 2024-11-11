@@ -5,6 +5,7 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -15,11 +16,13 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.Glide
 import com.example.notesapp.MainActivity
 import com.example.notesapp.R
 import com.example.notesapp.databinding.FragmentEditNoteBinding
@@ -39,6 +42,12 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note), MenuProvider {
     private lateinit var noteViewModel: NoteViewModel
     private lateinit var currentNote: Note
     private var selectedReminderDateTime: Long? = null
+    private var selectedImageUri: Uri? = null
+    private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        selectedImageUri = uri
+        binding.addNoteImage.setImageURI(uri)
+        binding.addNoteImage.visibility = View.VISIBLE
+    }
 
 
     private val args: EditNoteFragmentArgs by navArgs()
@@ -74,6 +83,28 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note), MenuProvider {
                 Date(it)
             )
             binding.selectedReminderDate.text = "Reminder set for: $formattedDateTime"
+        }
+        if(currentNote.imageUri!=null)
+        {
+            selectedImageUri = Uri.parse(currentNote.imageUri)
+            selectedImageUri?.let {
+                context?.let { it1 ->
+                    Glide.with(it1)
+                        .load(Uri.parse(currentNote.imageUri))
+                        .into(binding.addNoteImage)
+                }
+                binding.addNoteImage.visibility = View.VISIBLE
+            }
+
+        }
+
+        binding.addImageButton.setOnClickListener {
+            imagePickerLauncher.launch("image/*") // Allow user to select an image
+        }
+        binding.removeImageButton.setOnClickListener {
+            selectedImageUri = null
+            binding.addNoteImage.visibility = View.GONE
+
         }
 
         binding.addReminderButton.setOnClickListener {
@@ -159,7 +190,8 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note), MenuProvider {
             val updatedNote = currentNote.copy(
                 noteTitle = noteTitle,
                 noteDesc = noteDesc,
-                reminderDate = selectedReminderDateTime
+                reminderDate = selectedReminderDateTime,
+                imageUri = selectedImageUri?.toString()
             )
             noteViewModel.updateNote(updatedNote)
             selectedReminderDateTime?.let {
