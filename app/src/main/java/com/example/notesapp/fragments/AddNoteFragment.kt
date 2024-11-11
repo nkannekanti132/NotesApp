@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,6 +14,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
@@ -35,6 +37,13 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
     private lateinit var noteViewModel: NoteViewModel
     private lateinit var addNoteView: View
     private var selectedReminderDateTime: Long? = null
+
+    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        if (uri != null) {
+            // Set the image URI to the binding
+            binding.addNoteImage.setImageURI(uri)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +70,9 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
 
 
         addNoteView = view
+        binding.addImageButton.setOnClickListener {
+            pickImageLauncher.launch("image/*") // Allow user to select an image
+        }
         binding.addReminderButton.setOnClickListener {
             showDateTimePicker()
         }
@@ -117,6 +129,8 @@ class AddNoteFragment : Fragment(R.layout.fragment_add_note), MenuProvider {
     private fun saveNote(view: View) {
         val noteTitle = binding.addNoteTitle.text.trim().toString()
         val noteDesc = binding.addNoteDesc.text.trim().toString()
+
+        val imageUri = binding.addNoteImage.tag as? Uri
 
         if (noteTitle.isNotEmpty()) {
             val note = Note(

@@ -2,6 +2,7 @@ package com.example.notesapp.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -51,6 +52,10 @@ class NoteAdapter(val noteViewModel: NoteViewModel, val context: Context): Recyc
         holder.itemBinding.noteDesc.text = currentNote.noteDesc
         holder.itemBinding.pinnedIcon.isVisible = currentNote.isPinned  // Show pinned symbol if note is pinned
 
+        // Check if an image is associated with the note
+        if (currentNote.imageUri != null) {
+            holder.itemBinding.noteImage.setImageURI(Uri.parse(currentNote.imageUri))
+        }
         holder.itemView.setOnLongClickListener {
             currentNote.isPinned = !holder.itemBinding.pinnedIcon.isVisible
             if(!holder.itemBinding.pinnedIcon.isVisible)

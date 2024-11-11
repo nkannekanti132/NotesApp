@@ -46,6 +46,13 @@
                 android:id="@+id/pinnedIcon"
                 android:src="@drawable/baseline_push_pin_24"
                 />
+            <ImageView
+                android:id="@+id/noteImage"
+                android:layout_width="wrap_content"
+                android:layout_height="200dp"
+                android:layout_margin="8dp"
+                android:scaleType="centerCrop"
+                android:contentDescription="Note Image" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

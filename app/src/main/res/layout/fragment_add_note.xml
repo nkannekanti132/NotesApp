@@ -61,6 +61,19 @@
             android:layout_height="wrap_content"
             android:text="No reminder set"
             android:textAppearance="?android:attr/textAppearanceSmall" />
+        <Button
+            android:id="@+id/addImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Image" />
+
+        <ImageView
+            android:id="@+id/addNoteImage"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="Selected Image" />
 
     </LinearLayout>
 </layout>

@@ -14,5 +14,6 @@ data class Note(
     val noteTitle: String,
     val noteDesc: String,
     val reminderDate: Long? = null,
-    var isPinned: Boolean = false
+    var isPinned: Boolean = false,
+    val imageUri: String? = null
 ): Parcelable
