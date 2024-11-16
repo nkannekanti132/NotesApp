@@ -93,11 +93,12 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
 
     private fun searchNote(query: String)
     {
-       val searchQuery = "%$query"
+       val searchQuery = "$query%"
 
         noteViewModel.searchNotes(searchQuery).observe(viewLifecycleOwner){
             notes -> noteAdapter.differ.submitList(notes)
         }
+
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
@@ -110,6 +111,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
             searchNote(newText)
         }
         return true
+
     }
 
     override fun onDestroy() {
